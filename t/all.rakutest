@@ -1,0 +1,339 @@
+use Test;
+use File::Temp;
+
+use-ok('Test::Selector');
+
+# --------------------------------------------------------------------
+#|{
+
+The testsel() function is for writing tests for this module. It takes
+a single argument, a four-part string that looks like this for
+example:
+
+    Τ1 a
+
+    t a1 => { ok(42, "42 is true.") };
+    t a2 => { ok(23, "23 is true too.") };
+
+    1..0
+
+    # No tests run!
+
+and builds the appropriate test functions from it. The string will be
+split into its parts on "\n\n+":
+
+    ⟨The test's label⟩ ❲TEST_SELECTOR_LABELS_GLOB value❳? ❲TEST_SELECTOR_ACTION value❳?
+
+    ｢The tests｣
+
+    ｢Expected STDOUT｣
+
+    ｢Expected STDERR｣
+
+I prefixed all the tests's labels with the letter ｢Τ｣ (U-03a4) to make
+searching for them easier.
+
+Care must be taken that none of the parts contain two consecutive
+newlines (the separator), but the easy readability of the tests makes
+the little extra effort worth it.
+}
+
+# --------------------------------------------------------------------
+sub testsel (
+    Str $test_def is copy,
+    Str $block-def_sub = 't',
+    Str $block-lbl_sub = 'label',
+) {
+    $test_def .= chomp;
+    my ($iden, $tests, $exp-out, $exp-err) = $test_def.split(/\n\n+/);
+    my ($label, $glob, $action) = $iden.split(/ <space> +/);
+
+        # Set up the environment variables.
+    $glob   = (! $glob.defined || $glob eq "undef") ?? "*" !! $glob;
+    $action = ! $action.defined ?? "run" !! $action;
+    %*ENV<TEST_SELECTOR_LABELS_GLOB>   = $glob;
+    %*ENV<TEST_SELECTOR_ACTION> = $action;
+
+        # The expected STDERR may be empty.
+    $exp-err = "" unless $exp-err.defined;
+
+        # Build a test file.
+    my ($fn, $fh) = tempfile;
+    print $fh: qq:to/EoF/;
+        use Test;
+        use Test::Selector '$block-def_sub', '$block-lbl_sub';
+        $tests
+        done-testing;
+        EoF
+    $fh.close;
+   # note $fn; $*IN.get;
+
+        # Run it.
+    my @cmd = $*EXECUTABLE-NAME, "-I", "lib", $fn;
+    my $proc = run @cmd, :err, :out;
+    my $got-out = $proc.out.slurp-rest.chomp;
+    my $got-err = $proc.err.slurp-rest.chomp;
+
+        # See if expectations match.
+    is($got-out, $exp-out, "$label Out okay.");
+    is($got-err, $exp-err, "$label Err okay.");
+}
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_ignore-test
+
+t __a0a => { ok(42, "42 is true.") };
+
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_char-range N1[bcd]*
+
+t N1a =>  { ; }
+t N1d =>  { ; }
+t N1g =>  { ; }
+t N1e =>  { ; }
+t N1 =>   { ; }
+t N1b =>  { ; }
+t N1ba => { ; }
+t N1A =>  { ; }
+
+   # N1d
+   # N1b
+   # N1ba
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_stderr
+
+t __a0a => { ok(42, "42 is true.") };
+say $*ERR: "Moo";
+
+1..0
+
+Moo
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/, "foo";
+Τ_diff-sub-name
+
+foo a1 => { ok(42, "42 is true.") };
+
+   # a1
+ok 1 - 42 is true.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_skip-non-match a
+
+t a2 => { ok(42, "42 is true.") };
+
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_one-test
+
+t a3 => { ok(42, "42 is true.") };
+
+   # a3
+ok 1 - 42 is true.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_var-test-id
+
+my $a = 'a3b';
+t $a => { ok(42, "42 is true.") };
+
+   # a3b
+ok 1 - 42 is true.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_match-all a*
+
+t a4 => { ok(42, "42 is true.") };
+
+   # a4
+ok 1 - 42 is true.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_matchall_dflt undef
+
+t a5 => { ok(42, "42 is true.") };
+
+   # a5
+ok 1 - 42 is true.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_no-match *b*
+
+t a6 => { ok(42, "42 is true.") };
+
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_list undef list
+
+t a7 => { ok(42, "42 is true.") };
+t b1 => { ok(23, "23 is true too.") };
+
+a7
+b1
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_list-subset1 b* list
+
+t a8 => { ok(42, "42 is true.") };
+t b2 => { ok(23, "23 is true too.") };
+
+b2
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_list-subset2 b? list
+
+t a8  => { ok(42, "42 is true.") };
+t b3  => { ok(23, "23 is true too.") };
+t b3a => { ok(66, "66 is true too.") };
+
+b3
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_list-subset3 b?b list
+
+t a8  => { ok(42, "42 is true.") };
+t b3  => { ok(23, "23 is true too.") };
+t b3b => { ok(66, "66 is true too.") };
+t b4a => { ok(22, "22 is true too.") };
+t b5b => { ok(99, "99 is true too.") };
+
+b3b
+b5b
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_see-label
+
+t a10 => { is(label, 'a10', "Test ID is 'a10'.") };
+
+   # a10
+ok 1 - Test ID is 'a10'.
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_diff-sub-name2 *a*
+
+use Test::Selector "foo";
+foo a11 => { ok(42, "foo") };
+
+   # a11
+ok 1 - foo
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_diff-sub-name3 *a*
+
+t a12a => { ok(42, "t") };
+#
+use Test::Selector "foo";
+foo a12b => { ok(42, "foo") };
+#
+use Test::Selector "bar";
+bar a12c => { ok(42, "bar") };
+
+   # a12a
+ok 1 - t
+   # a12b
+ok 2 - foo
+   # a12c
+ok 3 - bar
+1..3
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_list-subset4 a* list
+
+t   a1 => { 1 };
+t __a2 => { 2 };
+t  _a3 => { 3 };
+t   a4 => { ok(4, "Four") };
+
+a1
+__a2
+_a3
+a4
+1..0
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_run-subset a* run
+
+t   a1 => { 1 };
+t __a2 => { 2 };
+t  _a3 => { 3 };
+t   a4 => { ok(4, "Four") };
+
+   # a1
+   # _a3 : skipped
+   # a4
+ok 1 - Four
+1..1
+EoT
+
+# --------------------------------------------------------------------
+testsel q:to/EoT/;
+Τ_bad_action * no-such-action
+
+t   a1 => { 1 };
+t __a2 => { 2 };
+t  _a3 => { 3 };
+t   a4 => { ok(4, "Four") };
+say $*ERR: "Moo";
+
+1..0
+
+Moo
+EoT
+
+# --------------------------------------------------------------------
+done-testing;
+
