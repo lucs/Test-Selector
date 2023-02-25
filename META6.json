@@ -1,12 +1,14 @@
 {
   "authors": [
-    "Luc St-Louis"
+    "Luc St-Louis <lucs@pobox.com>"
   ],
   "build-depends": [
   ],
   "depends": [
+    "IO::Glob",
+    "Path::Finder"
   ],
-  "description": "blah blah blah",
+  "description": "Have separately invokable labeled blocks in test files",
   "license": "Artistic-2.0",
   "name": "Test::Selector",
   "perl": "6.d",
@@ -15,10 +17,14 @@
   },
   "resources": [
   ],
-  "source-url": "",
+  "source-url": "git://github.com/lucs/TestSelector.git",
+  "support": {
+    "source": "lucs@pobox.com"
+  },
   "tags": [
   ],
   "test-depends": [
+    "File::Temp"
   ],
   "version": "0.0.1"
 }
