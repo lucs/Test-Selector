@@ -1,6 +1,0 @@
-use Test;
-use Test::Selector;
-
-pass "replace me";
-
-done-testing;
