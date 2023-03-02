@@ -6,11 +6,13 @@ use IO::Glob;
 proto sub MAIN (|) is export {*}
 
 multi sub MAIN (
-    $module-directory,
-    :f($pfx) = '',
-    :t($test_labels-glob) = '*',
+    Str  $blocks-glob = '*',
+    Str  :f($files-prefix) = '',
     Bool :l($list) = False,
     Bool :q($quiet) = False,
+    Str  :i($lib) = './lib',
+    Str  :t($test-dirs) = './t',
+    Str  :r($rakulib) = '',
 ) {
 
     sub test-file ($f, $quiet) {
@@ -35,7 +37,7 @@ multi sub MAIN (
     }
 
         # Set up required envvars.
-    %*ENV<TEST_SELECTOR_LABELS_GLOB> = $test_labels-glob;
+    %*ENV<TEST_SELECTOR_BLOCKS_GLOB> = $blocks-glob;
     %*ENV<TEST_SELECTOR_ACTION> = $list ?? 'list' !! 'run';
     %*ENV<RAKULIB> = %*ENV<RAKULIB>
         ?? "$module-directory/lib," ~ %*ENV<RAKULIB>
@@ -43,8 +45,9 @@ multi sub MAIN (
     ;
 
     my $rule = Path::Finder.or(
-        Path::Finder.name("$pfx*.rakutest"),
-        Path::Finder.name("$pfx*.t"),
+        Path::Finder.name("$files-prefix*.rakutest"),
+        Path::Finder.name("$files-prefix*.t"),
+        Path::Finder.name("$files-prefix*.t6"),
     );
 
     for $rule.in("$module-directory/t") -> $f {
