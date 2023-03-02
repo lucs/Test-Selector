@@ -1,4 +1,5 @@
 {
+  "auth": "zef:lucs",
   "authors": [
     "Luc St-Louis <lucs@pobox.com>"
   ],
@@ -11,14 +12,13 @@
   "description": "Have separately invokable labeled blocks in test files",
   "license": "Artistic-2.0",
   "name": "Test::Selector",
-  "perl": "6.d",
+  "raku": "6.*",
   "provides": {
-    "Test::Selector": "lib/Test/Selector.rakumod",
-    "Test::Selector::Main": "lib/Test/Selector/Main.rakumod"
+    "Test::Selector": "lib/Test/Selector.rakumod"
   },
   "resources": [
   ],
-  "source-url": "git://github.com/lucs/TestSelector.git",
+  "source-url": "git://github.com/lucs/Test-Selector.git",
   "support": {
     "source": "lucs@pobox.com"
   },
