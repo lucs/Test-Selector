@@ -8,7 +8,7 @@ Test::Selector - Have separately invokable labeled blocks in test files
 
 In your test files, ｢use｣ the Test::Selector module and wrap the
 blocks you may want to separately invoke as follows, for example in
-the ｢⟨Module directory⟩/t/04-foo.rakumod｣ file:
+the ｢⟨Module directory⟩/t/04-foo.rakutest｣ file:
 
     use Test;
     use Test::Selector;
@@ -36,46 +36,26 @@ the ｢⟨Module directory⟩/t/04-foo.rakumod｣ file:
     };
 
 Note that, all other things being equal, code that is not thusly
-wrapped will run normally.
+wrapped will run normally, so that if you use this module to wrap some
+tests, it may be a good idea to wrap them all, or maybe wrap the ones
+you don't necessarily want to run separately in a single big block, to
+avoid running all that code all the time.
 
 To run all the blocks in the example file, use plain Raku:
 
     cd ⟨Module directory⟩
-    raku -Ilib t/04-foo.rakumod
+    raku -Ilib t/04-foo.rakutest
 
-or use the ｢tsel｣ program, supplied by this module:
+or use the ｢tsel｣ program, supplied by this module, described later.
 
-        Run labeled blocks only in files found under the ｢t/｣
-        subdirectory of the ⟨Module directory⟩ and whose name begins
-        as shown by the ｢-f｣ option.
-    tsel ⟨Module directory⟩ -f=04
-
-To run only the block labeled ｢n2｣ in that file:
-
-    tsel ⟨Module directory⟩ -f=04 -t=n2
-
-Similarly, to run all the blocks whose label begins with ｢s｣ (the ｢*｣
-is escaped with a ｢\｣ to prevent shell expansion):
-
-    tsel ⟨Module directory⟩ -f=04 -t=s\*
-
-To run tests quietly, preventing ｢ok:｣ and ｢# Subtest:｣ lines from
-being displayed:
-
-    tsel ⟨Module directory⟩ -f=04 -q
-
-To simply list all the block labels found in the file:
-
-    tsel ⟨Module directory⟩ -f=04 -l
-
-Note that if the ｢-f｣ option is absent, all test files found under the
-｢⟨Module directory⟩/t｣ directory will be used.
+    cd ⟨Module directory⟩
+    tsel -f=04
 
 =head1 Rationale
 
 During development of a module, you may want to run only one or more
-of its tests to see how your code is coming along; you may not
-care yet whether the other tests pass or not.
+of its tests to see how your code is coming along; you may not yet
+care whether the other tests pass or not.
 
 The traditional way to run tests separately is to have them in
 different files, but this can lead to having many of them and it might
@@ -90,14 +70,20 @@ installed.
 =head1 The ｢tsel｣ program
 
 Supplied by this module, the program is used to select which labeled
-blocks to run and in which test files.
+blocks to run, in which test files, and where to look for modules.
+Here are a few example invocations:
 
-It has one mandatory argument: the directory holding the module's
-development code, where its ｢./lib｣ directory will be prepended to the
-RAKULIB envvar when running the blocks, and its ｢./t｣ directory, which
-will be searched for the files holding the labeled blocks.
+    cd ⟨Module directory⟩
+    tsel -f=04 n1
+    tsel -f=04 s\*
+    tsel -q ⋯
+    tsel -l s\*
+    tsel -ri=⋯/SomeModule/lib,/⋯/OtherModule/lib ⋯
 
-It has the following optional arguments:
+    cd ⟨Arbitrary directory⟩
+    tsel -t=⋯/MyModule/t -r=⋯/MyModule/lib,/⋯/OtherModule/lib ⋯
+
+｢tsel｣ has the following arguments:
 
     ⟨Blocks glob⟩ :
 
@@ -114,13 +100,13 @@ It has the following optional arguments:
         prevent them being expanded by the shell, and labels they
         could match or not:
 
-            -t=n\*      Yes: n, n1, nything     No: anything
-            -t=\[ab]\*c Yes: axc, a23c, bc      No: abcd, ebc
-            -t=a1\?     Yes: a11, a1x           No: a1bc
+            n\*      Yes: n, n1, nything     No: an
+            \[ab]\*c Yes: axc, a23c, bc      No: abcd, ebc
+            a1\?     Yes: a11, a1x           No: a1, a1bc
 
     -f=⟨Files prefix⟩ :
 
-        Only files whose extension is ｢.t｣, ｢.t6｣, or ｢.rakutest｣ and
+        Only files whose extension is ｢.rakutest｣, ｢.t｣, or ｢.t6｣ and
         whose name starts with the specified prefix characters will be
         used.
 
@@ -129,6 +115,25 @@ It has the following optional arguments:
         Example:
 
             -f=04   Yes: 04-foo.t    No: 04-bar.raku
+
+    -t=⟨Test files directories⟩ :
+
+        Test files will be searched for in these comma separated
+        directories.
+
+        Default: ｢./t｣
+
+    -r=⟨Directories to prepend to RAKULIB⟩
+
+        Default: ｢./lib｣
+        
+    -ri=⟨Directories to prepend to RAKULIB, including ./lib⟩
+
+        Default: ｢｣
+        
+          You may need to specify this if you are not running the
+          program from within that directory (necessary to
+          find the lib/ and t/ subdirectories).
 
     -l :
 
@@ -139,24 +144,15 @@ It has the following optional arguments:
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being displayed.
 
-    -m=⟨Module root directory⟩
-
-          You need to specify this if you are not running the
-          program from within that directory (necessary to
-          find the lib/ and t/ subdirectories).
-
-    -r=⟨Prepend to RAKULIB⟩
-
-        It may happen that you need 
 
 =head1 sub label ()
 
-Used in a block, returns the subroutine's label. For example, the
-following prints  «My label is a42␤»:
+Used in a block, returns the block's label. For example, when run, the
+following block prints  «My label is a42␤»:
 
     t a42 => {
         say "My label is ", label;
-    }
+    };
 
 =head1 How do I skip running some blocks?
 
@@ -179,19 +175,19 @@ passing the wanted names as arguments. To use a different name for
 
 And you'd use it just like ｢t｣:
 
-    my-blocksub-name some-label => { … };
+    my-blocksub-name ⟨some-label⟩ => { … };
 
 To use a different name for ｢label｣, you need to pass two arguments:
 the first one is the desired new (or same) name for ｢t｣, and the
 second the new name for ｢label｣. For example:
 
-    use Test::Selector 't', 'my-labelsub-name'
+    use Test::Selector 't', 'my-labelsub-name';
 
 Similarly, you'd use it just like ｢label｣:
 
     t a42 => {
         say "My label is ", my-labelsub-name;
-    }
+    };
 
 =head1 AUTHOR
 
