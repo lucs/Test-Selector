@@ -1,18 +1,17 @@
 unit class Test::Selector::Main;
 
 use Path::Finder;
-use IO::Glob;
 
 proto sub MAIN (|) is export {*}
 
 multi sub MAIN (
     Str  $blocks-glob = '*',
-    Str  :f($files-prefix) = '',
-    Bool :l($list) = False,
-    Bool :q($quiet) = False,
-    Str  :i($lib) = './lib',
+    Str  :f($files-prefix),
     Str  :t($test-dirs) = './t',
-    Str  :r($rakulib) = '',
+    Str  :ri($lib-dirs),
+    Str  :r($rakulib),
+    Bool :q($quiet) = False,
+    Bool :l($list) = False,
 ) {
 
     sub test-file ($f, $quiet) {
