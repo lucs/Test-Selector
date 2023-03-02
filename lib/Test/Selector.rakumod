@@ -16,10 +16,6 @@ the ｢⟨Module directory⟩/t/04-foo.rakumod｣ file:
     t n1 => {
         my $n = 42;
         ok($n + $n == 2 * $n, "Adding a number to itself doubles it.");
-    };
-
-    t n2 => {
-        my $n = 23;
         ok($n * $n == $n ^ 2, "Multiplying a number by itself squares it.");
     };
 
@@ -47,30 +43,30 @@ To run all the blocks in the example file, use plain Raku:
     cd ⟨Module directory⟩
     raku -Ilib t/04-foo.rakumod
 
-or use the ｢test_select.raku｣ program, supplied by this module:
+or use the ｢tsel｣ program, supplied by this module:
 
         Run labeled blocks only in files found under the ｢t/｣
         subdirectory of the ⟨Module directory⟩ and whose name begins
         as shown by the ｢-f｣ option.
-    test_select.raku ⟨Module directory⟩ -f=04
+    tsel ⟨Module directory⟩ -f=04
 
 To run only the block labeled ｢n2｣ in that file:
 
-    test_select.raku ⟨Module directory⟩ -f=04 -t=n2
+    tsel ⟨Module directory⟩ -f=04 -t=n2
 
 Similarly, to run all the blocks whose label begins with ｢s｣ (the ｢*｣
 is escaped with a ｢\｣ to prevent shell expansion):
 
-    test_select.raku ⟨Module directory⟩ -f=04 -t=s\*
+    tsel ⟨Module directory⟩ -f=04 -t=s\*
 
 To run tests quietly, preventing ｢ok:｣ and ｢# Subtest:｣ lines from
 being displayed:
 
-    test_select.raku ⟨Module directory⟩ -f=04 -q
+    tsel ⟨Module directory⟩ -f=04 -q
 
 To simply list all the block labels found in the file:
 
-    test_select.raku ⟨Module directory⟩ -f=04 -l
+    tsel ⟨Module directory⟩ -f=04 -l
 
 Note that if the ｢-f｣ option is absent, all test files found under the
 ｢⟨Module directory⟩/t｣ directory will be used.
@@ -79,7 +75,7 @@ Note that if the ｢-f｣ option is absent, all test files found under the
 
 During development of a module, you may want to run only one or more
 of its tests to see how your code is coming along; you may not
-care whether the other tests pass or not.
+care yet whether the other tests pass or not.
 
 The traditional way to run tests separately is to have them in
 different files, but this can lead to having many of them and it might
@@ -91,7 +87,7 @@ When the module is ready for release, nothing special needs to be
 done, and its tests will run (or not) normally when the module is
 installed.
 
-=head1 The ｢test_select.raku｣ program
+=head1 The ｢tsel｣ program
 
 Supplied by this module, the program is used to select which labeled
 blocks to run and in which test files.
@@ -103,20 +99,10 @@ will be searched for the files holding the labeled blocks.
 
 It has the following optional arguments:
 
-    -f=⟨Prefix of test files to use⟩ :
+    ⟨Blocks glob⟩ :
 
-        Only files whose name starts with the prefix characters, will
-        be used, and whose extension is ｢.t｣ or ｢.rakutest｣, will be
-        used.
-
-        Default: all files with the proper extension will be used.
-        Example:
-
-            -f=04   Yes: 04-foo.t    No: 04-bar.raku
-
-    -t=⟨Glob of block labels to use⟩ :
-
-        Only blocks matching this glob will be used.
+        Only blocks matching the specified glob will be used.
+        Recognized glob characters and what they match are:
 
             *    : any string
             ?    : exactly one character
@@ -124,22 +110,44 @@ It has the following optional arguments:
 
         Default: ｢*｣
 
-        Examples, with escaped ｢*｣, ｢?｣, and ｢[｣ characters, to prevent
-        them being expanded by the shell, and labels they could match:
+        Examples, with escaped ｢*｣, ｢?｣, and ｢[｣ characters, to
+        prevent them being expanded by the shell, and labels they
+        could match or not:
 
             -t=n\*      Yes: n, n1, nything     No: anything
-            -t=\[ab]\*c Yes: axc, a23c, bc      No: abcd, edc
-            -t=a1\?     Yes: a11, a1rx          No: a1
+            -t=\[ab]\*c Yes: axc, a23c, bc      No: abcd, ebc
+            -t=a1\?     Yes: a11, a1x           No: a1bc
+
+    -f=⟨Files prefix⟩ :
+
+        Only files whose extension is ｢.t｣, ｢.t6｣, or ｢.rakutest｣ and
+        whose name starts with the specified prefix characters will be
+        used.
+
+        Default: all files with the proper extension will be used.
+
+        Example:
+
+            -f=04   Yes: 04-foo.t    No: 04-bar.raku
 
     -l :
 
-        Will run no blocks, just alphabetically list all matching
-        block labels
+        This will only alphabetically list all matching block labels.
         
     -q :
 
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being displayed.
+
+    -m=⟨Module root directory⟩
+
+          You need to specify this if you are not running the
+          program from within that directory (necessary to
+          find the lib/ and t/ subdirectories).
+
+    -r=⟨Prepend to RAKULIB⟩
+
+        It may happen that you need 
 
 =head1 sub label ()
 
@@ -167,11 +175,11 @@ names, eh). You can set the names you want instead at ｢use｣ time, by
 passing the wanted names as arguments. To use a different name for
 ｢t｣, pass a single argument, the name you want. For example:
 
-    use Test::Selector 'my-tsub-name';
+    use Test::Selector 'my-blocksub-name';
 
 And you'd use it just like ｢t｣:
 
-    my-tsub-name some-label => { … };
+    my-blocksub-name some-label => { … };
 
 To use a different name for ｢label｣, you need to pass two arguments:
 the first one is the desired new (or same) name for ｢t｣, and the
@@ -206,7 +214,7 @@ my $block-lbl_sub;
 
 class Test::Selector {
 
-    my $glob = %*ENV<TEST_SELECTOR_LABELS_GLOB> // '*';
+    my $glob = %*ENV<TEST_SELECTOR_BLOCKS_GLOB> // '*';
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';
 
     proto sub block-lbl (|) is export {*}
