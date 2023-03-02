@@ -13,7 +13,8 @@
   "name": "Test::Selector",
   "perl": "6.d",
   "provides": {
-    "Test::Selector": "lib/Test/Selector.rakumod"
+    "Test::Selector": "lib/Test/Selector.rakumod",
+    "Test::Selector::Main": "lib/Test/Selector/Main.rakumod"
   },
   "resources": [
   ],
