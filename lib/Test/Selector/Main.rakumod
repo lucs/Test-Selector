@@ -61,17 +61,19 @@ multi sub MAIN (
     }
 
         # Set up the test directories.
+    my $t-dirs;
     if $test-dirs {
         if $also-test-dirs {
             note "At most one of the -t of -ti options can be used.";
             exit 1;
         }
+        $t-dirs = $test-dirs;
     }
     elsif $also-test-dirs {
-        $test-dirs = "$*CWD/t,$also-test-dirs";
+        $t-dirs = "$*CWD/t,$also-test-dirs";
     }
     else {
-        $test-dirs = "$*CWD/t";
+        $t-dirs = "$*CWD/t";
     }
 
         # Set up other required envvars.
@@ -85,7 +87,7 @@ multi sub MAIN (
         Path::Finder.name("$files-prefix*.t6"),
     );
 
-    for $rule.in("$test-dirs".split: ',') -> $f {
+    for $rule.in("$t-dirs".split: ',') -> $f {
        # say $f.path;
         test-file $f, $quiet;
     }
