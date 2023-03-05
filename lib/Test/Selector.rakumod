@@ -34,6 +34,8 @@ blocks like shown here:
         );
     };
 
+    done-testing;
+
 To run all the blocks (and thus, all the tests), from the module's
 root directory, invoke the supplied ｢tsel｣ program without arguments:
 
