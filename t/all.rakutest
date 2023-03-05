@@ -51,7 +51,7 @@ sub testsel (
         # Set up the environment variables.
     $glob   = (! $glob.defined || $glob eq "undef") ?? "*" !! $glob;
     $action = ! $action.defined ?? "run" !! $action;
-    %*ENV<TEST_SELECTOR_LABELS_GLOB>   = $glob;
+    %*ENV<TEST_SELECTOR_BLOCKS_GLOB> = $glob;
     %*ENV<TEST_SELECTOR_ACTION> = $action;
 
         # The expected STDERR may be empty.
