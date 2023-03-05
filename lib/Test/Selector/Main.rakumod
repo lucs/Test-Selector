@@ -2,14 +2,15 @@ unit class Test::Selector::Main;
 
 use Path::Finder;
 
-proto sub MAIN (|) is export {*}
+proto sub MAIN (|) is export(:MAIN) {*}
 
 multi sub MAIN (
     Str  $blocks-glob = '*',
-    Str  :f($files-prefix),
-    Str  :t($test-dirs) = './t',
-    Str  :ri($lib-dirs),
-    Str  :r($rakulib),
+    Str  :f($files-prefix) = '',
+    Str  :t($test-dirs),
+    Str  :ti($also-test-dirs),
+    Str  :r($lib-dirs),
+    Str  :ri($also-lib-dirs),
     Bool :q($quiet) = False,
     Bool :l($list) = False,
 ) {
@@ -35,22 +36,57 @@ multi sub MAIN (
         }
     }
 
-        # Set up required envvars.
+        # If for some reason RAKULIB is already set, we will change it
+        # only by prepending to it.
+    sub prepend-to-rakulib ($dirs) {
+        %*ENV<RAKULIB> = %*ENV<RAKULIB>
+            ?? "$dirs," ~ %*ENV<RAKULIB>
+            !! $dirs
+        ;
+    }
+
+        # Set up RAKULIB.
+    if $lib-dirs {
+        if $also-lib-dirs {
+            note "At most one of the -r of -ri options can be used.";
+            exit 1;
+        }
+        prepend-to-rakulib $lib-dirs;
+    }
+    elsif $also-lib-dirs {
+        prepend-to-rakulib "$*CWD/lib,$also-lib-dirs"
+    }
+    else {
+        prepend-to-rakulib "$*CWD/lib";
+    }
+
+        # Set up the test directories.
+    if $test-dirs {
+        if $also-test-dirs {
+            note "At most one of the -t of -ti options can be used.";
+            exit 1;
+        }
+    }
+    elsif $also-test-dirs {
+        $test-dirs = "$*CWD/t,$also-test-dirs";
+    }
+    else {
+        $test-dirs = "$*CWD/t";
+    }
+
+        # Set up other required envvars.
     %*ENV<TEST_SELECTOR_BLOCKS_GLOB> = $blocks-glob;
     %*ENV<TEST_SELECTOR_ACTION> = $list ?? 'list' !! 'run';
-    %*ENV<RAKULIB> = %*ENV<RAKULIB>
-        ?? "$module-directory/lib," ~ %*ENV<RAKULIB>
-        !! "$module-directory/lib"
-    ;
 
+        # Run the blocks in the matching files.
     my $rule = Path::Finder.or(
         Path::Finder.name("$files-prefix*.rakutest"),
         Path::Finder.name("$files-prefix*.t"),
         Path::Finder.name("$files-prefix*.t6"),
     );
 
-    for $rule.in("$module-directory/t") -> $f {
-        say $f.path;
+    for $rule.in("$test-dirs".split: ',') -> $f {
+       # say $f.path;
         test-file $f, $quiet;
     }
 
