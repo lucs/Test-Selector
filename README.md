@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/lucs/Test-Selector/actions/workflows/test.yml/badge.svg)](https://github.com/lucs/Test-Selector/actions)
+
 NAME
 ====
 
@@ -32,6 +34,8 @@ In your test file, wrap the parts you may want to run separately in blocks like 
             "Lowercasing an uppercased string is the same as just lowercasing it.",
         );
     };
+
+    done-testing;
 
 To run all the blocks (and thus, all the tests), from the module's root directory, invoke the supplied ｢tsel｣ program without arguments:
 
