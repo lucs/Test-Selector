@@ -1,12 +1,12 @@
 NAME
 ====
 
-Test::Selector - Have separately invokable labeled blocks in test files
+Test::Selector - Selectively run only parts of test files
 
 SYNOPSIS
-========
+--------
 
-In your test files, ｢use｣ the Test::Selector module and wrap the blocks you may want to separately invoke as follows, for example in the ｢⟨Module directory⟩/t/04-foo.rakumod｣ file:
+In your test file, wrap the parts you may want to run separately in blocks like shown here:
 
     use Test;
     use Test::Selector;
@@ -14,11 +14,7 @@ In your test files, ｢use｣ the Test::Selector module and wrap the blocks you 
     t n1 => {
         my $n = 42;
         ok($n + $n == 2 * $n, "Adding a number to itself doubles it.");
-    };
-
-    t n2 => {
-        my $n = 23;
-        ok($n * $n == $n ^ 2, "Multiplying a number by itself squares it.");
+        ok($n * $n == $n ** 2, "Multiplying a number by itself squares it.");
     };
 
     t s1 => {
@@ -32,111 +28,122 @@ In your test files, ｢use｣ the Test::Selector module and wrap the blocks you 
     t s2 => {
         my $s = 'xYz';
         ok(
-            $s.uc.lc eq $s,lc,
+            $s.uc.lc eq $s.lc,
             "Lowercasing an uppercased string is the same as just lowercasing it.",
         );
     };
 
-Note that, all other things being equal, code that is not thusly wrapped will run normally.
-
-To run all the blocks in the example file, use plain Raku:
+To run all the blocks (and thus, all the tests), from the module's root directory, invoke the supplied ｢tsel｣ program without arguments:
 
     cd ⟨Module directory⟩
-    raku -Ilib t/04-foo.rakumod
+    tsel
 
-or use the ｢test_select.raku｣ program, supplied by this module:
+To run only the blocks whose label matches the glob 's*', run it like this:
 
-    Run labeled blocks only in files found under the ｢t/｣
-    subdirectory of the ⟨Module directory⟩ and whose name begins
-    as shown by the ｢-f｣ option.
+    tsel s\*
 
-    test_select.raku ⟨Module directory⟩ -f=04
+The '*' is escaped with a backslash to prevent the shell from expanding it to eventually matching file names.
 
-To run only the block labeled ｢n2｣ in that file:
+Note that, all other things being equal, code that is not wrapped like above will run normally, so that if you use this module to wrap some tests, it may be a good idea to wrap them all, or maybe wrap the ones you don't necessarily want to run separately in a single big block, to avoid running all that code all the time.
 
-    test_select.raku ⟨Module directory⟩ -f=04 -t=n2
+Also note that this wrapping shouldn't interfere with ordinary testing, like just doing ｢raku ./t/mytests.rakutest｣ or when using ｢prove6｣ for example.
 
-Similarly, to run all the blocks whose label begins with ｢s｣ (the ｢*｣ is escaped with a ｢\｣ to prevent shell expansion):
+The ｢tsel｣ program
+------------------
 
-    test_select.raku ⟨Module directory⟩ -f=04 -t=s\*
+During development of a module, you may want to run only one or more of its tests to see how your code is coming along; you may not yet care whether the other tests pass or not, or may wish not to have to waste time while they are running.
 
-To run tests quietly, preventing ｢ok:｣ and ｢# Subtest:｣ lines from being displayed:
+The traditional way to run tests separately is to have them in different files, but this can lead to having many of them and it might be hard to find which ones are relevant at any point during development.
 
-    test_select.raku ⟨Module directory⟩ -f=04 -q
+Supplied by this module, the ｢tsel｣ program is used to select some labeled blocks to run, and to specify where to look for and in which test files to look for the blocks, and where to look for other modules that may be necessary during development.
 
-To simply list all the block labels found in the file:
+By default, ｢tsel｣ expects you to run it from the root directory of your module in development; that is, it expects to find there a ./t subdirectory with the test files, and a ./lib subdirectory to which it will set RAKULIB before running the tests.
 
-    test_select.raku ⟨Module directory⟩ -f=04 -l
+Here are a few example invocations:
 
-Note that if the ｢-f｣ option is absent, all test files found under the ｢⟨Module directory⟩/t｣ directory will be used.
+    cd ⟨Module directory⟩
+    tsel -f=04 n1
+    tsel -f=04 s\*
+    tsel -q ⋯
+    tsel -l s\*
+    tsel -ri=⋯/SomeModule/lib,/⋯/OtherModule/lib ⋯
 
-Rationale
-=========
+    cd ⟨Arbitrary directory⟩
+    tsel -t=⋯/MyModule/t -r=⋯/MyModule/lib,⋯/OtherModule/lib ⋯
 
-During development of a module, you may want to run only one or more of its tests to see how your code is coming along; you may not care whether the other tests pass or not.
+｢tsel｣ arguments
+----------------
 
-The traditional way to run tests separately is to have them in different files, but this can lead to having many of them and it might be hard to find which ones are relevant at any point during development. It may be easier to find which tests to run if fewer files have to be searched, thus this module.
+｢tsel｣ has the following arguments:
 
-When the module is ready for release, nothing special needs to be done, and its tests will run (or not) normally when the module is installed.
+    ⟨Blocks glob⟩ :
 
-The ｢test_select.raku｣ program
-==============================
+        Only blocks whose label matches the specified glob will be
+        run. Recognized glob characters and what they match are:
 
-Supplied by this module, the program is used to select which labeled blocks to run and in which test files.
-
-It has one mandatory argument: the directory holding the module's development code, where its ｢./lib｣ directory will be prepended to the RAKULIB envvar when running the blocks, and its ｢./t｣ directory, which will be searched for the files holding the labeled blocks.
-
-It has the following optional arguments:
-
-    -f=⟨Prefix of test files to use⟩ :
-
-        Only files whose name starts with the prefix characters, will
-        be used, and whose extension is ｢.t｣ or ｢.rakutest｣, will be
-        used.
-
-        Default: all files with the proper extension will be used.
-        Example:
-
-            -f=04   Yes: 04-foo.t    No: 04-bar.raku
-
-    -t=⟨Glob of block labels to use⟩ :
-
-        Only blocks matching this glob will be used.
-
-            *    : any string
+            *    : any string, zero or more characters
             ?    : exactly one character
             […]  : characters from a set, for example ｢[abc]｣
 
         Default: ｢*｣
 
-        Examples, with escaped ｢*｣, ｢?｣, and ｢[｣ characters, to prevent
-        them being expanded by the shell, and labels they could match:
+        Here are some examples, escaping the special glob characters
+        to prevent them from being expanded by the shell, and labels
+        they could match or not:
 
-            -t=n\*      Yes: n, n1, nything     No: anything
-            -t=\[ab]\*c Yes: axc, a23c, bc      No: abcd, edc
-            -t=a1\?     Yes: a11, a1rx          No: a1
+            n\*      Yes: n, n1, nything     No: an
+            \[ab]\*c Yes: axc, a23c, bc      No: abcd, ebc
+            a1\?     Yes: a11, a1x           No: a1, a1bc
+
+    -f=⟨Files prefix⟩ :
+
+        Only files whose extension is ｢.rakutest｣, ｢.t｣, or ｢.t6｣ and
+        whose name starts with the specified prefix characters will be
+        used.
+
+        Default: all files with the proper extension will be used.
+
+        Example:
+
+            -f=04   Yes: 04-foo.rakutest, 04.t6  No: 04-bar.raku
+
+    -t=⟨Use test files found in these comma separated directories⟩
+    -ti=⟨Use test files found in ./t and in these comma separated directories⟩
+
+        At most one of these options may be specified. If none is
+        specified, test files will be searched for in ./t, the idea being
+        that you will usually be running the program from the root of
+        the module in development.
+
+
+    -r=⟨Prepend to RAKULIB these comma separated directories⟩
+    -ri=⟨Prepend to RAKULIB ./lib and these comma separated directories⟩
+
+        At most one of these options may be specified. If none is
+        specified, ./lib will be prepended to RAKULIB, the idea being
+        that you will usually be running the program from the root of
+        the module in development.
 
     -l :
 
-        Will run no blocks, just alphabetically list all matching
-        block labels
-        
+        This will only alphabetically list all matching block labels.
+
     -q :
 
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being displayed.
 
 sub label ()
-============
+------------
 
-Used in a block, returns the subroutine's label. For example, the following prints «My label is a42␤»:
+Used in a labeled block, returns the block's label. For example, when run, the following block outputs «My label is a42␤»:
 
     t a42 => {
         say "My label is ", label;
-    }
+    };
 
 How do I skip running some blocks?
-==================================
+----------------------------------
 
 Prepend ｢__｣ or ｢_｣ to the block label:
 
@@ -146,33 +153,33 @@ Prepend ｢__｣ or ｢_｣ to the block label:
           displayed.
 
 Can I use different names for ｢t｣ and ｢label｣?
-==============================================
+----------------------------------------------
 
 You may want to do that if for some reason ｢t｣ or ｢label｣ would cause a name collision in your code (or maybe you just don't like those names, eh). You can set the names you want instead at ｢use｣ time, by passing the wanted names as arguments. To use a different name for ｢t｣, pass a single argument, the name you want. For example:
 
-    use Test::Selector 'my-tsub-name';
+    use Test::Selector 'my-blocksub-name';
 
 And you'd use it just like ｢t｣:
 
-    my-tsub-name some-label => { … };
+    my-blocksub-name ⟨some-label⟩ => { … };
 
 To use a different name for ｢label｣, you need to pass two arguments: the first one is the desired new (or same) name for ｢t｣, and the second the new name for ｢label｣. For example:
 
-    use Test::Selector 't', 'my-labelsub-name'
+    use Test::Selector 't', 'my-labelsub-name';
 
 Similarly, you'd use it just like ｢label｣:
 
     t a42 => {
         say "My label is ", my-labelsub-name;
-    }
+    };
 
 AUTHOR
-======
+------
 
 Luc St-Louis <lucs@pobox.com>
 
 COPYRIGHT AND LICENSE
-=====================
+---------------------
 
 Copyright © 2023 Luc St-Louis <lucs@pobox.com>
 
