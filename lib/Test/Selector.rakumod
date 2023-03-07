@@ -6,8 +6,32 @@ Test::Selector - Selectively run only parts of test files
 
 =head2 SYNOPSIS
 
-In your test file, wrap the parts you may want to run separately in
-blocks like shown here:
+Suppose you have this (admittedly useless and dumb) test file:
+
+    use Test;
+
+    plan 4;
+
+    my $n = 42;
+    ok($n + $n == 2 * $n, "Adding a number to itself doubles it.");
+    ok($n * $n == $n ** 2, "Multiplying a number by itself squares it.");
+
+    my $s1 = 'abc';
+    ok(
+        $s1.chars == $s1.flip.chars,
+        "A string backwards has the same number of characters.",
+    );
+
+    my $s2 = 'xYz';
+    ok(
+        $s2.uc.lc eq $s2.lc,
+        "Lowercasing an uppercased string is the same as just lowercasing it.",
+    );
+
+In your test file, use "Test::Selector", wrap the parts you may want
+to run separately in labeled blocks like shown here (and also have
+"done-testing" instead of a "plan", since not all tests will always be
+run):
 
     use Test;
     use Test::Selector;
@@ -19,17 +43,17 @@ blocks like shown here:
     };
 
     t s1 => {
-        my $s = 'abc';
+        my $s1 = 'abc';
         ok(
-            $s.chars == $s.flip.chars,
+            $s1.chars == $s1.flip.chars,
             "A string backwards has the same number of characters.",
         );
     };
 
     t s2 => {
-        my $s = 'xYz';
+        my $s2 = 'xYz';
         ok(
-            $s.uc.lc eq $s.lc,
+            $s2.uc.lc eq $s2.lc,
             "Lowercasing an uppercased string is the same as just lowercasing it.",
         );
     };
@@ -136,7 +160,6 @@ Here are a few example invocations:
         specified, test files will be searched for in ./t, the idea being
         that you will usually be running the program from the root of
         the module in development.
-
 
     -r=⟨Prepend to RAKULIB these comma separated directories⟩
     -ri=⟨Prepend to RAKULIB ./lib and these comma separated directories⟩
