@@ -154,7 +154,7 @@ Note also that skipped or ignored blocks will have their label, with
 their underscore prefix, displayed by the -l option if the label
 (without the underscores) matches the requested block glob.
 
-=head2 Can I use different names for ｢t｣ and ｢label｣?
+=head2 Can I use different names for 't' and 'label'?
 
 You may want to do that if for some reason ｢t｣ or ｢label｣ would cause
 a name collision in your code (or maybe you just don't like those
