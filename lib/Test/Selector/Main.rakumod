@@ -88,7 +88,6 @@ multi sub MAIN (
     );
 
     for $rule.in("$t-dirs".split: ',') -> $f {
-       # say $f.path;
         test-file $f, $quiet;
     }
 
