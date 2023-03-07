@@ -16,7 +16,7 @@ multi sub MAIN (
 ) {
 
     sub test-file ($f, $quiet) {
-        say "# Testing $f …";
+        say "# Testing $f…";
         my $proc = Proc::Async.new: :w, $*EXECUTABLE-NAME, $f;
 
         react {
