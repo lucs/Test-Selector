@@ -9,7 +9,7 @@
     "IO::Glob",
     "Path::Finder"
   ],
-  "description": "Selectively run only parts of test files",
+  "description": "Mark and selectively run only parts of test files",
   "license": "Artistic-2.0",
   "name": "Test::Selector",
   "provides": {
@@ -28,5 +28,5 @@
   "test-depends": [
     "File::Temp"
   ],
-  "version": "0.0.1"
+  "version": "0.1.0"
 }
