@@ -148,7 +148,7 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
 
 Note that even if a block is completely ignored by ｢tsel｣, it must
 nevertheless compile correctly; if it doesn't, you have no choice but
-to comment out or remove the offending code.
+to fix, comment out, or remove the offending code.
 
 Note also that skipped or ignored blocks will have their label, with
 their underscore prefix, displayed by the -l option if the label
