@@ -135,11 +135,11 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
     _   : The block will not be run, but a 'skipped' message will be
           displayed.
 
-Note that even if a block is completely ignored by ｢tsel｣, it must nevertheless compile correctly; if it doesn't, you have no choice but to comment out or remove the offending code.
+Note that even if a block is completely ignored by ｢tsel｣, it must nevertheless compile correctly; if it doesn't, you have no choice but to fix, comment out, or remove the offending code.
 
 Note also that skipped or ignored blocks will have their label, with their underscore prefix, displayed by the -l option if the label (without the underscores) matches the requested block glob.
 
-Can I use different names for ｢t｣ and ｢label｣?
+Can I use different names for 't' and 'label'?
 ----------------------------------------------
 
 You may want to do that if for some reason ｢t｣ or ｢label｣ would cause a name collision in your code (or maybe you just don't like those names, eh). You can set the names you want instead at ｢use｣ time, by passing the wanted names as arguments. To use a different name for ｢t｣, pass a single argument, the name you want. For example:
@@ -150,7 +150,7 @@ And you'd use it just like ｢t｣:
 
     my-blocksub ⟨some-label⟩ => { … };
 
-To use a different name for ｢label｣, you need to pass two arguments: the first one is the desired new (or same) name for ｢t｣, and the second the new name for ｢label｣. For example:
+To use a different name for ｢label｣, you need to pass two arguments: the first one is the desired new (or same) name for ｢t｣, and the second, the new name for ｢label｣. For example:
 
     use Test::Selector 't', 'my-labelsub';
 
