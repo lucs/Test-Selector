@@ -170,7 +170,7 @@ And you'd use it just like ｢t｣:
 
 To use a different name for ｢label｣, you need to pass two arguments:
 the first one is the desired new (or same) name for ｢t｣, and the
-second the new name for ｢label｣. For example:
+second, the new name for ｢label｣. For example:
 
     use Test::Selector 't', 'my-labelsub';
 
