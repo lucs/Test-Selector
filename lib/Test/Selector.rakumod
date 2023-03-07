@@ -6,7 +6,8 @@ Test::Selector - Selectively run only parts of test files
 
 =head2 SYNOPSIS
 
-Suppose you have this (admittedly useless and dumb) test file:
+Suppose you have the following (admittedly useless and dumb) test
+file:
 
     use Test;
 
