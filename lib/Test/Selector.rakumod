@@ -2,105 +2,56 @@
 
 =head1 NAME
 
-Test::Selector - Selectively run only parts of test files
+Test::Selector - Mark and selectively run only parts of test files
 
-=head2 SYNOPSIS
-
-Suppose you have the following (admittedly useless and dumb) test
-file:
-
-    use Test;
-
-    plan 4;
-
-    my $n = 42;
-    ok($n + $n == 2 * $n, "Adding a number to itself doubles it.");
-    ok($n * $n == $n ** 2, "Multiplying a number by itself squares it.");
-
-    my $s1 = 'abc';
-    ok(
-        $s1.chars == $s1.flip.chars,
-        "A reversed string is the same length as the original string.",
-    );
-
-    my $s2 = 'xYz';
-    ok(
-        $s2.uc.lc eq $s2.lc,
-        "Lowercasing an uppercased string is the same as just lowercasing it.",
-    );
-
-In your test file, use "Test::Selector", wrap the parts you may want
-to run separately in labeled blocks like shown here and have
-"done-testing" instead of a "plan", since not all tests will always be
-run:
-
-    use Test;
-    use Test::Selector;
-
-    t n1 => {
-        my $n = 42;
-        ok($n + $n == 2 * $n, "Adding a number to itself doubles it.");
-        ok($n * $n == $n ** 2, "Multiplying a number by itself squares it.");
-    };
-
-    t s1 => {
-        my $s1 = 'abc';
-        ok(
-            $s1.chars == $s1.flip.chars,
-            "A string backwards has the same number of characters.",
-        );
-    };
-
-    t s2 => {
-        my $s2 = 'xYz';
-        ok(
-            $s2.uc.lc eq $s2.lc,
-            "Lowercasing an uppercased string is the same as just lowercasing it.",
-        );
-    };
-
-    done-testing;
-
-To run all the blocks (and thus, all the tests), from the module's
-root directory, invoke the supplied ｢tsel｣ program without arguments:
-
-    cd ⟨Module directory⟩
-    tsel
-
-To run only the blocks whose label matches the glob 's*', run it like
-this:
-
-    tsel s\*
-
-The '*' is escaped with a backslash to prevent the shell from
-expanding it to eventually matching file names.
-
-Note that, all other things being equal, code that is not wrapped like
-above will run normally, so that if you use this module to wrap some
-tests, it may be a good idea to wrap them all, or maybe wrap the ones
-you don't necessarily want to run separately in a single big block, to
-avoid running all that code all the time.
-
-Also note that this wrapping shouldn't interfere with ordinary
-testing, like just doing ｢raku ./t/mytests.rakutest｣ or when using
-｢prove6｣ for example.
-
-=head2 The ｢tsel｣ program
+=head2 DESCRIPTION
 
 During development of a module, you may want to run only one or more
-of its tests to see how your code is coming along; you may not yet
-care whether the other tests pass or not, or just don't want to have
-to wait for them to finish.
+of the tests in its test files to see how your code is coming along;
+you may not yet care whether the other tests pass or not or you just
+don't want to have to wait for them to finish.
 
 The traditional way to run tests separately is to have them in
 different files, but this can lead to having many of them and it might
 be hard to find which ones are relevant at any point during
 development.
 
-Supplied by this module, the ｢tsel｣ program is used to select some
-labeled blocks to run, and to specify where to look for and in which
-test files to look for the blocks, and where to look for other modules
-that may be necessary during development.
+With this module, you will be able to wrap into labeled blocks parts
+of your test files and use the supplied ｢tsel｣ program to select which
+of these blocks to run. It also lets you specify where to find the
+test files and in which ones to look for the blocks. You can also
+specify where to find other modules that may be required, but not yet
+installed.
+
+=head2 Labeled blocks
+
+Given the following (uninteresting) original code from a test file:
+
+    my $str = 'abc';
+    ok(
+        $str.chars == $str.flip.chars,
+        "A reversed string is the same length as the original.",
+    );
+
+for the purpose of this module, you would wrap it like this with some
+arbitrary label, here 's1':
+
+    t s1 => {
+        my $str = 'abc';
+        ok(
+            $str.chars == $str.flip.chars,
+            "A reversed string is the same length as the original.",
+        );
+    }
+
+｢t｣ is a subroutine exported by the module. It can be invoked in one
+of the following example ways:
+
+    t meep => { ⋯ }
+
+    t $str => { ⋯ }
+
+=head2 The 'tsel' program
 
 By default, ｢tsel｣ expects you to run it from the root directory of
 your module in development; that is, it expects to find there a ./t
@@ -110,7 +61,7 @@ will set RAKULIB before running the tests.
 Here are a few example invocations:
 
     cd ⟨Module directory⟩
-    tsel -f=04 n1
+    tsel s1
     tsel -f=04 s\*
     tsel -q ⋯
     tsel -l s\*
@@ -118,8 +69,6 @@ Here are a few example invocations:
 
     cd ⟨Arbitrary directory⟩
     tsel -t=⋯/MyModule/t -r=⋯/MyModule/lib,⋯/OtherModule/lib ⋯
-
-=head2 ｢tsel｣ arguments
 
 ｢tsel｣ has the following arguments:
 
@@ -198,8 +147,8 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
           displayed.
 
 Note that even if a block is completely ignored by ｢tsel｣, it must
-nevertheless be compile correctly; if it doesn't, you have no choice
-but to comment out or remove the offending code.
+nevertheless compile correctly; if it doesn't, you have no choice but
+to comment out or remove the offending code.
 
 Note also that skipped or ignored blocks will have their label, with
 their underscore prefix, displayed by the -l option if the label
@@ -231,6 +180,128 @@ Similarly, you'd use it just like ｢label｣:
         say "My label is ", my-labelsub;
     };
 
+=head2 Full Example
+
+Suppose you have the following (admittedly useless and dumb)
+｢⋯/t/foo.rakutest｣ file:
+
+    use Test;
+
+    plan 3;
+
+    my $str = 'abc';
+    ok(
+        $str.chars == $str.flip.chars,
+        "A reversed string is the same length as the original.",
+    );
+
+    my $foo = 'xYz';
+    ok(
+        $foo !~~ / \d /,
+        "The string '$foo' contains no digits.",
+    );
+    ok(
+        $foo.chars == 3,
+        "The string '$foo' has three characters.",
+    );
+
+    say "Hello, just printing this.";
+
+Running ｢raku ⋯/t/foo.rakutest｣ would produce:
+
+    1..3
+    ok 1 - A reversed string is the same length as the original.
+    ok 2 - The string 'xYz' contains no digits.
+    ok 3 - The string 'xYz' has three characters.
+    Hello, just printing this.
+ 
+Now suppose you would like to sometimes run either one (or both) of
+the string tests. Using this module, you could wrap those parts in
+labeled blocks like shown below and have "done-testing" instead of a
+"plan" (since not all tests will always be run). For example:
+
+    use Test;
+    use Test::Selector;
+
+    t s1 => {
+        my $str = 'abc';
+        ok(
+            $str.chars == $str.flip.chars,
+            "A reversed string is the same length as the original.",
+        );
+    }
+
+    t s2 => {
+        my $foo = 'xYz';
+        ok(
+            $foo !~~ / \d /,
+            "The string '$foo' contains no digits.",
+        );
+        ok(
+            $foo.chars == 3,
+            "The string '$foo' has three characters.",
+        );
+    }
+
+    say "Hello, just printing this.";
+
+    done-testing;
+
+To run all the blocks, and thus all the tests, run it as before, or
+invoke the supplied ｢tsel｣ program from the module's root directory
+(which holds the ｢t/｣ subdirectory where our test file is), without
+arguments:
+
+    cd ⟨Module directory⟩
+    tsel
+
+That will print:
+
+    # Testing foo.rakutest…
+       # s1
+    ok 1 - A reversed string is the same length as the original.
+       # s2
+    ok 2 - The string 'xYz' contains no digits.
+    ok 3 - The string 'xYz' has three characters.
+    Hello, just printing this.
+    1..3
+
+Notice a few differences:
+
+    . The name of the file being tested is printed.
+    . Output from a labeled block is preceded by the label
+      printing that label.
+
+Now let's ask ｢tsel｣ to run only the block labeled 's2':
+
+    tsel s2
+
+That prints:
+
+    # Testing foo.rakutest…
+       # s2
+    ok 1 - The string 'xYz' contains no digits.
+    ok 2 - The string 'xYz' has three characters.
+    Hello, just printing this.
+    1..2
+ 
+Nice, but maybe we don't care about that "Hello" line or, for that
+matter, any other code that may appear in the file. To prevent such
+code from being run all the time, you could comment it out (it would
+never run then, eh) or place all such code in one or more labeled
+blocks. For example:
+
+    t dont-care => {
+        say "Hello, just printing this.";
+    }
+
+With that, running ｢tsel s1｣ would print:
+
+    # Testing foo.rakutest…
+       # s1
+    ok 1 - A reversed string is the same length as the original.
+    1..1
+ 
 =head2 AUTHOR
 
 Luc St-Louis <lucs@pobox.com>
