@@ -21,7 +21,7 @@ Suppose you have the following (admittedly useless and dumb) test file:
     my $s1 = 'abc';
     ok(
         $s1.chars == $s1.flip.chars,
-        "A string backwards has the same number of characters.",
+        "A reversed string is the same length as the original string.",
     );
 
     my $s2 = 'xYz';
@@ -77,7 +77,7 @@ Also note that this wrapping shouldn't interfere with ordinary testing, like jus
 The ｢tsel｣ program
 ------------------
 
-During development of a module, you may want to run only one or more of its tests to see how your code is coming along; you may not yet care whether the other tests pass or not, or may wish not to have to waste time while they are running.
+During development of a module, you may want to run only one or more of its tests to see how your code is coming along; you may not yet care whether the other tests pass or not, or just don't want to have to wait for them to finish.
 
 The traditional way to run tests separately is to have them in different files, but this can lead to having many of them and it might be hard to find which ones are relevant at any point during development.
 
@@ -170,32 +170,36 @@ Used in a labeled block, returns the block's label. For example, when run, the f
 How do I skip running some blocks?
 ----------------------------------
 
-Prepend ｢__｣ or ｢_｣ to the block label:
+Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
 
     __  : The block will be completely ignored.
 
     _   : The block will not be run, but a 'skipped' message will be
           displayed.
 
+Note that even if a block is completely ignored by ｢tsel｣, it must nevertheless be compile correctly; if it doesn't, you have no choice but to comment out or remove the offending code.
+
+Note also that skipped or ignored blocks will have their label, with their underscore prefix, displayed by the -l option if the label (without the underscores) matches the requested block glob.
+
 Can I use different names for ｢t｣ and ｢label｣?
 ----------------------------------------------
 
 You may want to do that if for some reason ｢t｣ or ｢label｣ would cause a name collision in your code (or maybe you just don't like those names, eh). You can set the names you want instead at ｢use｣ time, by passing the wanted names as arguments. To use a different name for ｢t｣, pass a single argument, the name you want. For example:
 
-    use Test::Selector 'my-blocksub-name';
+    use Test::Selector 'my-blocksub';
 
 And you'd use it just like ｢t｣:
 
-    my-blocksub-name ⟨some-label⟩ => { … };
+    my-blocksub ⟨some-label⟩ => { … };
 
 To use a different name for ｢label｣, you need to pass two arguments: the first one is the desired new (or same) name for ｢t｣, and the second the new name for ｢label｣. For example:
 
-    use Test::Selector 't', 'my-labelsub-name';
+    use Test::Selector 't', 'my-labelsub';
 
 Similarly, you'd use it just like ｢label｣:
 
     t a42 => {
-        say "My label is ", my-labelsub-name;
+        say "My label is ", my-labelsub;
     };
 
 AUTHOR
