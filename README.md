@@ -30,7 +30,7 @@ Suppose you have this (admittedly useless and dumb) test file:
         "Lowercasing an uppercased string is the same as just lowercasing it.",
     );
 
-In your test file, use "Test::Selector", wrap the parts you may want to run separately in labeled blocks like shown here (and also have "done-testing" instead of a "plan", since not all tests will always be run):
+In your test file, use "Test::Selector", wrap the parts you may want to run separately in labeled blocks like shown here and have "done-testing" instead of a "plan", since not all tests will always be run:
 
     use Test;
     use Test::Selector;
