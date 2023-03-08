@@ -3,8 +3,6 @@
   "authors": [
     "Luc St-Louis <lucs@pobox.com>"
   ],
-  "build-depends": [
-  ],
   "depends": [
     "IO::Glob",
     "Path::Finder"
@@ -16,13 +14,12 @@
     "Test::Selector": "lib/Test/Selector.rakumod"
   },
   "raku": "6.*",
-  "resources": [
-  ],
   "source-url": "git://github.com/lucs/Test-Selector.git",
   "support": {
-    "source": "lucs@pobox.com"
+    "email": "lucs@pobox.com"
   },
   "tags": [
+      "test"
   ],
   "test-depends": [
     "File::Temp"
