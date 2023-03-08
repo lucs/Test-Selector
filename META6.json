@@ -13,8 +13,7 @@
   "license": "Artistic-2.0",
   "name": "Test::Selector",
   "provides": {
-    "Test::Selector": "lib/Test/Selector.rakumod",
-    "Test::Selector::Main": "lib/Test/Selector/Main.rakumod"
+    "Test::Selector": "lib/Test/Selector.rakumod"
   },
   "raku": "6.*",
   "resources": [
