@@ -33,13 +33,13 @@ for the purpose of this module, you would wrap it like this with some arbitrary 
             $str.chars == $str.flip.chars,
             "A reversed string is the same length as the original.",
         );
-    }
+    };
 
 ｢t｣ is a subroutine exported by the module. It can be invoked in one of the following example ways:
 
-    t meep => { ⋯ }
+    t meep => { ⋯ };
 
-    t $str => { ⋯ }
+    t $str => { ⋯ };
 
 The 'tsel' program
 ------------------
@@ -60,10 +60,11 @@ Here are a few example invocations:
 
 ｢tsel｣ has the following arguments:
 
-    ⟨Blocks glob⟩ :
+    ⟨Blocks label pattern⟩ :
 
-        Only blocks whose label matches the specified glob will be
-        run. Recognized glob characters and what they match are:
+        Only blocks whose label matches the specified pattern will be
+        run. Some characters in the pattern are special; here is what
+        they match:
 
             *    : any string, zero or more characters
             ?    : exactly one character
@@ -71,9 +72,9 @@ Here are a few example invocations:
 
         Default: ｢*｣
 
-        Here are some examples, escaping the special glob characters
-        to prevent them from being expanded by the shell, and labels
-        they could match or not:
+        Here are some examples, escaping the special characters to
+        prevent them from being expanded by the shell, and labels they
+        could match or not:
 
             n\*      Yes: n, n1, nything     No: an
             \[ab]\*c Yes: axc, a23c, bc      No: abcd, ebc
@@ -135,9 +136,29 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
     _   : The block will not be run, but a 'skipped' message will be
           displayed.
 
+For example, given:
+
+    t   s1 => { say "I'm block '{label}'." };
+    t __s2 => { say "I'm block '{label}'." };
+    t  _s3 => { say "I'm block '{label}'." };
+
+running ｢tsel s\*｣ will print:
+
+    # Testing ⟨the file⟩:
+       # s1
+    I'm block 's1'.
+       # _s3 : skipped
+    1..0
+
 Note that even if a block is completely ignored by ｢tsel｣, it must nevertheless compile correctly; if it doesn't, you have no choice but to fix, comment out, or remove the offending code.
 
-Note also that skipped or ignored blocks will have their label, with their underscore prefix, displayed by the -l option if the label (without the underscores) matches the requested block glob.
+Note also that skipped or ignored blocks will have their label, with their underscore prefix, displayed by the -l option if the label (without the underscores) matches the requested block label pattern. For example, given the same as above, running ｢tsel -l s\*｣ will print:
+
+    # Labels in ⟨the file⟩:
+    s1
+    __s2
+    _s3
+    1..0
 
 Can I use different names for 't' and 'label'?
 ----------------------------------------------
@@ -206,7 +227,7 @@ Now suppose you would like to sometimes run either one (or both) of the string t
             $str.chars == $str.flip.chars,
             "A reversed string is the same length as the original.",
         );
-    }
+    };
 
     t s2 => {
         my $foo = 'xYz';
@@ -218,7 +239,7 @@ Now suppose you would like to sometimes run either one (or both) of the string t
             $foo.chars == 3,
             "The string '$foo' has three characters.",
         );
-    }
+    };
 
     say "Hello, just printing this.";
 
@@ -231,7 +252,7 @@ To run all the blocks, and thus all the tests, run it as before, or invoke the s
 
 That will print:
 
-    # Testing foo.rakutest…
+    # Testing foo.rakutest:
        # s1
     ok 1 - A reversed string is the same length as the original.
        # s2
@@ -252,7 +273,7 @@ Now let's ask ｢tsel｣ to run only the block labeled 's2':
 
 That prints:
 
-    # Testing foo.rakutest…
+    # Testing foo.rakutest:
        # s2
     ok 1 - The string 'xYz' contains no digits.
     ok 2 - The string 'xYz' has three characters.
@@ -263,14 +284,21 @@ Nice, but maybe we don't care about that "Hello" line or, for that matter, any o
 
     t dont-care => {
         say "Hello, just printing this.";
-    }
+    };
 
 With that, running ｢tsel s1｣ would print:
 
-    # Testing foo.rakutest…
+    # Testing foo.rakutest:
        # s1
     ok 1 - A reversed string is the same length as the original.
     1..1
+
+One last example. Running ｢tsel -q｣ would print:
+
+    # Testing foo.rakutest:
+       # s1
+       # s2
+    1..3
 
 AUTHOR
 ------
