@@ -70,7 +70,6 @@ sub testsel (
 
         # Run it.
     my @cmd = $*EXECUTABLE-NAME, "-I", "lib", $fn;
-    say @cmd.join: ' - ';
     my $proc = run @cmd, :err, :out;
     my $got-out = $proc.out.slurp-rest.chomp;
     my $got-err = $proc.err.slurp-rest.chomp;
