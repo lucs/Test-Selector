@@ -2,6 +2,11 @@ Revision history for Test-Selector
 
 {{$NEXT}}
 
+0.1.4 2023-03-26T22:39:52-04:00 
+    - Show an example of using a variable as a block label.
+    - Improve the doc somewhat.
+    - Remove unnecessary trailing semicolons in the doc.
+
 0.1.3 2023-03-08T20:12:52-05:00
     - Remove a forgotten debugging statement.
 
