@@ -8,8 +8,8 @@ Test::Selector - Mark and selectively run only parts of test files
 
 During development of a module, you may want to run only one or more
 of the tests in its test files to see how your code is coming along;
-you may not yet care whether the other tests pass or not or you just
-don't want to have to wait for them to finish.
+you may not yet care whether the other tests pass or not or you may
+just not want to have to wait for them to finish.
 
 The traditional way to run tests separately is to have them in
 different files, but this can lead to having many of them and it might
@@ -25,7 +25,7 @@ installed.
 
 =head2 Labeled blocks
 
-Given the following (uninteresting) original code from a test file:
+Suppose you have the following (uninteresting) code in a test file:
 
     my $str = 'abc';
     ok(
@@ -33,7 +33,7 @@ Given the following (uninteresting) original code from a test file:
         "A reversed string is the same length as the original.",
     );
 
-for the purpose of this module, you would wrap it like this with some
+For the purpose of this module, you would wrap it like this with some
 arbitrary label, here 's1':
 
     t s1 => {
@@ -44,6 +44,9 @@ arbitrary label, here 's1':
         );
     }
 
+Then to run specifically that block, from the command line you would
+invoke ｢▸ tsel s1｣.
+
 ｢t｣ is a subroutine exported by the module. It can be invoked in one
 of the following example ways:
 
@@ -51,6 +54,8 @@ of the following example ways:
 
     t $str => { ⋯ }
 
+The latter form is useful when generating many similar tests; an
+example of this will be shown later.
 
 =head2 The 'tsel' program
 
@@ -128,12 +133,12 @@ Here are a few example invocations:
     -q :
 
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
-        lines from being displayed.
+        lines from being output.
 
 =head2 sub label ()
 
 Used in a labeled block, returns the block's label. For example, when
-run, the following block outputs «My label is a42␤»:
+run, the following block prints «My label is a42␤»:
 
     t a42 => {
         say "My label is ", label;
@@ -146,7 +151,7 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
     __  : The block will be completely ignored.
 
     _   : The block will not be run, but a 'skipped' message will be
-          displayed.
+          output.
 
 For example, given:
 
@@ -154,14 +159,13 @@ For example, given:
     t __s2 => { say "I'm block '{label}'." }
     t  _s3 => { say "I'm block '{label}'." }
 
-running ｢tsel s\*｣ will print:
+running ｢▸ tsel s\*｣ will output something like this:
 
     # Testing ⟨the file⟩:
        # s1
     I'm block 's1'.
        # _s3 : skipped
-    1..0
- 
+
 Note that even if a block is completely ignored by ｢tsel｣, it must
 nevertheless compile correctly; if it doesn't, you have no choice but
 to fix, comment out, or remove the offending code.
@@ -169,14 +173,14 @@ to fix, comment out, or remove the offending code.
 Note also that skipped or ignored blocks will have their label, with
 their underscore prefix, displayed by the -l option if the label
 (without the underscores) matches the requested block label pattern.
-For example, given the same as above, running ｢tsel -l s\*｣ will print:
+For example, given the same as above, running ｢▸ tsel -l s\*｣ will
+show something like this:
 
     # Labels in ⟨the file⟩:
     s1
     __s2
     _s3
-    1..0
- 
+
 =head2 Can I use different names for 't' and 'label'?
 
 You may want to do that if for some reason ｢t｣ or ｢label｣ would cause
@@ -228,20 +232,22 @@ Suppose you have the following (admittedly useless and dumb)
         "The string '$foo' has three characters.",
     );
 
-    say "Hello, just printing this.";
+    say "Hi there!";
 
-Running ｢raku ⋯/t/foo.rakutest｣ would produce:
+Running ｢▸ raku ⋯/t/foo.rakutest｣ would produce:
 
     1..3
     ok 1 - A reversed string is the same length as the original.
     ok 2 - The string 'xYz' contains no digits.
     ok 3 - The string 'xYz' has three characters.
-    Hello, just printing this.
- 
-Now suppose you would like to sometimes run either one (or both) of
-the string tests. Using this module, you could wrap those parts in
-labeled blocks like shown below and have "done-testing" instead of a
-"plan" (since not all tests will always be run). For example:
+    Hi there!
+
+Now suppose you would like to sometimes run separately either the
+first test or the second and third together (they share the
+lexical-scoped $foo variable, so it makes sense, eh). Using this
+module, you could wrap those parts in labeled blocks and have
+"done-testing" instead of a "plan" (since not all tests will always be
+run). For example:
 
     use Test;
     use Test::Selector;
@@ -266,7 +272,7 @@ labeled blocks like shown below and have "done-testing" instead of a
         );
     }
 
-    say "Hello, just printing this.";
+    say "Hi there!";
 
     done-testing;
 
@@ -286,14 +292,14 @@ That will print:
        # s2
     ok 2 - The string 'xYz' contains no digits.
     ok 3 - The string 'xYz' has three characters.
-    Hello, just printing this.
+    Hi there!
     1..3
 
 Notice a few differences:
 
-    . The name of the file being tested is printed.
-    . Output from a labeled block is preceded by the label
-      printing that label.
+    . The name of the file being tested is output.
+    . Output from a labeled block is preceded by a comment
+      displaying that label.
 
 Now let's ask ｢tsel｣ to run only the block labeled 's2':
 
@@ -305,33 +311,34 @@ That prints:
        # s2
     ok 1 - The string 'xYz' contains no digits.
     ok 2 - The string 'xYz' has three characters.
-    Hello, just printing this.
+    Hi there!
     1..2
- 
-Nice, but maybe we don't care about that "Hello" line or, for that
+
+Nice, but maybe we don't care about that "Hi there!" line or, for that
 matter, any other code that may appear in the file. To prevent such
 code from being run all the time, you could comment it out (it would
 never run then, eh) or place all such code in one or more labeled
-blocks. For example:
+blocks (prefixed or not with underscores to make them ignored, it's up
+to you). For example:
 
     t dont-care => {
-        say "Hello, just printing this.";
+        say "Hi there!";
     }
 
-With that, running ｢tsel s1｣ would print:
+With that, running ｢▸ tsel s1｣ would output:
 
     # Testing foo.rakutest:
        # s1
     ok 1 - A reversed string is the same length as the original.
     1..1
-  
-One last example. Running ｢tsel -q｣ would print:
+
+One last example. Running ｢▸ tsel -q｣ would then output:
 
     # Testing foo.rakutest:
        # s1
        # s2
     1..3
- 
+
 =head2 AUTHOR
 
 Luc St-Louis <lucs@pobox.com>
