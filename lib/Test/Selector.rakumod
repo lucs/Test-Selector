@@ -339,6 +339,64 @@ One last example. Running ｢▸ tsel -q｣ would then output:
        # s2
     1..3
 
+=head2 Using a variable as a block label
+
+Suppose you're developing a function named foo(), and you have the
+following test blocks:
+
+    t a1 => {
+        is( (my $result = foo('x', 4)), 'xxxx' );
+        is( $result.chars, 4 );
+    }
+    t a2 => {
+        is( (my $result = foo('ZZZ', 2)), 'ZZZZZZ' );
+        is( $result.chars, 6 );
+    }
+    t a3 => {
+        is( (my $result = foo(5, 3)), 15 );
+        is( $result.chars, 2 );
+    }
+
+Note that again, the example is contrived, useless, and dumb, and that
+the foo() function and its tests appear to be somewhat ill-conceived
+(but all that is another problem). What is interesting here is to note
+that all those blocks have the exact same structure, so we could do
+this instead (full code included, even that foo() function):
+
+    use Test;
+    use Test::Selector;
+
+    sub foo ($c, Int $i) {
+        return $c ~~ Int ?? $c * $i !! $c x $i;
+    }
+
+    sub check-foo (
+        $block-id,
+        $arg1,
+        $arg2,
+        $expected-result,
+        $expected-length,
+    ) {
+        t "a$block-id" => {
+            is( (my $result = foo($arg1, $arg2)), $expected-result );
+            is( $result.chars, $expected-length );
+        }
+    }
+
+    check-foo |< 1 x   4 xxxx   4 >;
+    check-foo |< 2 ZZZ 2 ZZZZZZ 6 >;
+    check-foo |< 3 5   3 15     2 >;
+
+    done-testing;
+
+So to run only the last one, you'd invoke ｢▸ tsel a3｣.
+
+Now the test data is much easier to prepare and if the structure of
+the test itself needs to be modified, it's going to be easy too.
+
+Note that a similar technique can, and probably should, be used when
+preparing tests that don't use this module.
+
 =head2 AUTHOR
 
 Luc St-Louis <lucs@pobox.com>
