@@ -42,14 +42,15 @@ arbitrary label, here 's1':
             $str.chars == $str.flip.chars,
             "A reversed string is the same length as the original.",
         );
-    };
+    }
 
 ｢t｣ is a subroutine exported by the module. It can be invoked in one
 of the following example ways:
 
-    t meep => { ⋯ };
+    t meep => { ⋯ }
 
-    t $str => { ⋯ };
+    t $str => { ⋯ }
+
 
 =head2 The 'tsel' program
 
@@ -136,7 +137,7 @@ run, the following block outputs «My label is a42␤»:
 
     t a42 => {
         say "My label is ", label;
-    };
+    }
 
 =head2 How do I skip running some blocks?
 
@@ -149,9 +150,9 @@ Prepend ｢__｣ or ｢_｣ (double or single underscore) to the block label:
 
 For example, given:
 
-    t   s1 => { say "I'm block '{label}'." };
-    t __s2 => { say "I'm block '{label}'." };
-    t  _s3 => { say "I'm block '{label}'." };
+    t   s1 => { say "I'm block '{label}'." }
+    t __s2 => { say "I'm block '{label}'." }
+    t  _s3 => { say "I'm block '{label}'." }
 
 running ｢tsel s\*｣ will print:
 
@@ -188,7 +189,7 @@ passing the wanted names as arguments. To use a different name for
 
 And you'd use it just like ｢t｣:
 
-    my-blocksub ⟨some-label⟩ => { … };
+    my-blocksub ⟨some-label⟩ => { … }
 
 To use a different name for ｢label｣, you need to pass two arguments:
 the first one is the desired new (or same) name for ｢t｣, and the
@@ -200,7 +201,7 @@ Similarly, you'd use it just like ｢label｣:
 
     t a42 => {
         say "My label is ", my-labelsub;
-    };
+    }
 
 =head2 Full Example
 
@@ -251,7 +252,7 @@ labeled blocks like shown below and have "done-testing" instead of a
             $str.chars == $str.flip.chars,
             "A reversed string is the same length as the original.",
         );
-    };
+    }
 
     t s2 => {
         my $foo = 'xYz';
@@ -263,7 +264,7 @@ labeled blocks like shown below and have "done-testing" instead of a
             $foo.chars == 3,
             "The string '$foo' has three characters.",
         );
-    };
+    }
 
     say "Hello, just printing this.";
 
@@ -315,7 +316,7 @@ blocks. For example:
 
     t dont-care => {
         say "Hello, just printing this.";
-    };
+    }
 
 With that, running ｢tsel s1｣ would print:
 
