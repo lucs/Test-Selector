@@ -10,7 +10,7 @@ The testsel() function is for writing tests for this module. It takes
 a single argument, a four-part string that looks like this for
 example:
 
-    Τ1 a
+    t_1 a
 
     t a1 => { ok(42, "42 is true.") };
     t a2 => { ok(23, "23 is true too.") };
@@ -29,9 +29,6 @@ split into its parts on "\n\n+":
     ｢Expected STDOUT｣
 
     ｢Expected STDERR｣
-
-I prefixed all the tests's labels with the letter ｢Τ｣ (U-03a4) to make
-searching for them easier.
 
 Care must be taken that none of the parts contain two consecutive
 newlines (the separator), but the easy readability of the tests makes
@@ -81,7 +78,7 @@ sub testsel (
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_ignore-test
+t_ignore-test
 
 t __a0a => { ok(42, "42 is true.") };
 
@@ -90,7 +87,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_char-range N1[bcd]*
+t_char-range N1[bcd]*
 
 t N1a =>  { ; }
 t N1d =>  { ; }
@@ -109,7 +106,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_stderr
+t_stderr
 
 t __a0a => { ok(42, "42 is true.") };
 say $*ERR: "Moo";
@@ -121,7 +118,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/, "foo";
-Τ_diff-sub-name
+t_diff-sub-name
 
 foo a1 => { ok(42, "42 is true.") };
 
@@ -132,7 +129,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_skip-non-match a
+t_skip-non-match a
 
 t a2 => { ok(42, "42 is true.") };
 
@@ -141,7 +138,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_one-test
+t_one-test
 
 t a3 => { ok(42, "42 is true.") };
 
@@ -152,7 +149,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_var-test-id
+t_var-test-id
 
 my $a = 'a3b';
 t $a => { ok(42, "42 is true.") };
@@ -164,7 +161,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_match-all a*
+t_match-all a*
 
 t a4 => { ok(42, "42 is true.") };
 
@@ -175,7 +172,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_matchall_dflt undef
+t_matchall_dflt undef
 
 t a5 => { ok(42, "42 is true.") };
 
@@ -186,7 +183,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_no-match *b*
+t_no-match *b*
 
 t a6 => { ok(42, "42 is true.") };
 
@@ -195,7 +192,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_list undef list
+t_list undef list
 
 t a7 => { ok(42, "42 is true.") };
 t b1 => { ok(23, "23 is true too.") };
@@ -207,7 +204,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_list-subset1 b* list
+t_list-subset1 b* list
 
 t a8 => { ok(42, "42 is true.") };
 t b2 => { ok(23, "23 is true too.") };
@@ -218,7 +215,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_list-subset2 b? list
+t_list-subset2 b? list
 
 t a8  => { ok(42, "42 is true.") };
 t b3  => { ok(23, "23 is true too.") };
@@ -230,7 +227,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_list-subset3 b?b list
+t_list-subset3 b?b list
 
 t a8  => { ok(42, "42 is true.") };
 t b3  => { ok(23, "23 is true too.") };
@@ -245,7 +242,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_see-label
+t_see-label
 
 t a10 => { is(label, 'a10', "Test ID is 'a10'.") };
 
@@ -256,7 +253,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_diff-sub-name2 *a*
+t_diff-sub-name2 *a*
 
 use Test::Selector "foo";
 foo a11 => { ok(42, "foo") };
@@ -268,7 +265,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_diff-sub-name3 *a*
+t_diff-sub-name3 *a*
 
 t a12a => { ok(42, "t") };
 #
@@ -289,7 +286,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_list-subset4 a* list
+t_list-subset4 a* list
 
 t   a1 => { 1 };
 t __a2 => { 2 };
@@ -305,7 +302,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_run-subset a* run
+t_run-subset a* run
 
 t   a1 => { 1 };
 t __a2 => { 2 };
@@ -321,7 +318,7 @@ EoT
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
-Τ_bad_action * no-such-action
+t_bad_action * no-such-action
 
 t   a1 => { 1 };
 t __a2 => { 2 };
