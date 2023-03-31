@@ -17,7 +17,7 @@ multi sub MAIN (
 
     sub test-file ($f, $action, $quiet) {
         say "# {$action eq 'run' ?? 'Testing' !! 'Labels in'} $f:";
-        my $proc = Proc::Async.new: :w, $*EXECUTABLE-NAME, $f;
+        my $proc = Proc::Async.new: :w, $*EXECUTABLE, $f;
 
         react {
             whenever $proc.stdout.lines {

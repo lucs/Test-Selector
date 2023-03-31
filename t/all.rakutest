@@ -63,10 +63,10 @@ sub testsel (
         done-testing;
         EoF
     $fh.close;
-   # note $fn; $*IN.get;
 
         # Run it.
-    my @cmd = $*EXECUTABLE-NAME, "-I", "lib", $fn;
+    my $lib = $?FILE.IO.dirname.IO.parent.child('lib').dirname;
+    my @cmd = $*EXECUTABLE, "-I", $lib, $fn;
     my $proc = run @cmd, :err, :out;
     my $got-out = $proc.out.slurp-rest.chomp;
     my $got-err = $proc.err.slurp-rest.chomp;
