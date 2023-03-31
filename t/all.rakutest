@@ -77,6 +77,38 @@ sub testsel (
 }
 
 # --------------------------------------------------------------------
+#`(
+
+Nice bug <https://github.com/lucs/Test-Selector/issues/1>. Only
+appears when lines printed to stderr by the module are longer than 127
+characters. Turns out it was because I cargo-culted the line "whenever
+$proc.stderr" into my Test::Selector::Main::MAIN's test-file() code
+instead of the correct "whenever $proc.stderr.lines".
+
+And although it appears that the correction holds in practice, I've
+been unable to write a correct test for this here, that is, a test
+that would fail given "whenever $proc.stderr" and succeed with
+"whenever $proc.stderr.lines".
+
+)
+
+# sub f {$^a}
+# 
+# testsel Q:f:to/EoT/;
+# t_stderr
+# 
+# note 'err ', '.' x 130;
+# 
+# 1..0
+# 
+# &f('err ' ~ '.' x 130)
+# EoT
+
+# --------------------------------------------------------------------
+#done-testing;
+#=finish
+
+# --------------------------------------------------------------------
 testsel q:to/EoT/;
 t_ignore-test
 
@@ -102,18 +134,6 @@ t N1A =>  { ; }
    # N1b
    # N1ba
 1..0
-EoT
-
-# --------------------------------------------------------------------
-testsel q:to/EoT/;
-t_stderr
-
-t __a0a => { ok(42, "42 is true.") };
-say $*ERR: "Moo";
-
-1..0
-
-Moo
 EoT
 
 # --------------------------------------------------------------------

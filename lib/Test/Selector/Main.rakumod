@@ -27,7 +27,7 @@ multi sub MAIN (
                 );
                 say $_;
             }
-            whenever $proc.stderr {
+            whenever $proc.stderr.lines {
                 say $_;
             }
             whenever $proc.start {
