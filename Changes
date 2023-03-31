@@ -2,6 +2,12 @@ Revision history for Test-Selector
 
 {{$NEXT}}
 
+0.1.5 2023-03-30T22:11:19-04:00
+    - Spell out the path to the lib directory when spawning test
+      files and use $*EXECUTABLE instead $*EXECUTABLE-NAME.
+    - Fix stderr output and document that I can't test it.
+    - Relabel the tests with a 't_' prefix.
+
 0.1.4 2023-03-26T22:39:52-04:00 
     - Show an example of using a variable as a block label.
     - Improve the doc somewhat.
