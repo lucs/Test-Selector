@@ -135,6 +135,13 @@ Here are a few example invocations:
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being output.
 
+    -v :
+
+        This will print the module version, something like
+        "Test::Selector 0.2.0 on rakudo (2023.02)", and immediately
+        exit the program.
+
+
 =head2 sub label ()
 
 Used in a labeled block, returns the block's label. For example, when
@@ -416,7 +423,7 @@ use IO::Glob;
 my $block-def_sub;
 my $block-lbl_sub;
 
-class Test::Selector {
+class Test::Selector:ver<0.2.0>:auth<zef:lucs> {
 
     my $glob = %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> // '*';
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';

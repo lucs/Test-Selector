@@ -2,6 +2,9 @@ Revision history for Test-Selector
 
 {{$NEXT}}
 
+0.2.0 2023-03-31T11:08:59-04:00
+    - Add a -v option to tsel to print out the module version.
+
 0.1.5 2023-03-30T22:11:19-04:00
     - Spell out the path to the lib directory when spawning test
       files and use $*EXECUTABLE instead $*EXECUTABLE-NAME.

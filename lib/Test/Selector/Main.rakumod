@@ -1,4 +1,4 @@
-unit class Test::Selector::Main;
+unit class Test::Selector::Main:ver<0.2.0>:auth<zef:lucs>;
 
 use Path::Finder;
 
@@ -13,8 +13,13 @@ multi sub MAIN (
     Str  :ri($also-lib-dirs),
     Bool :q($quiet) = False,
     Bool :l($list) = False,
+    Bool :v($version) = False,
 ) {
 
+    if $version {
+        say "Test::Selector {Test::Selector::Main.^ver} on $*RAKU.compiler.gist().";
+        exit 0;
+    }
     sub test-file ($f, $action, $quiet) {
         say "# {$action eq 'run' ?? 'Testing' !! 'Labels in'} $f:";
         my $proc = Proc::Async.new: :w, $*EXECUTABLE, $f;
