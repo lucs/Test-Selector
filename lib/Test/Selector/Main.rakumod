@@ -15,7 +15,31 @@ multi sub MAIN (
     Bool :qq($very-quiet) = False,
     Bool :l($list) = False,
     Bool :v($version) = False,
+    Bool :h($help)  = False,
 ) {
+
+    if $help {
+        say q:to/EoH/
+            ⦃▸ tsel -f=02 -qq a42⦄ Arguments to ◆tsel are:
+                Str  $blocks-glob   = '*'    Block labels matching this glob, ⦃a42⦄.
+                Str  :f($files-pfx) = ''     Files starting with this prefix, ⦃02⦄.
+                Bool :q($quiet)     = False  Quiet output.
+                Bool :qq($quieter)  = False  Quieter output, ⦃-qq⦄.
+                Bool :l($list)      = False  List block labels and exit 0.
+                Bool :v($version)   = False  Show version and exit 0.
+                Bool :h($help)      = False  Show this message and exit 0.
+
+                    Test files in …<./t/> or in one of these.
+                Str  :t($test-dirs)         In these dirs.
+                Str  :ti($also-test-dirs)   In …<./t/>, then in these dirs.
+
+                    .rakumod files in …<./lib/> or in one of these.
+                Str  :r($lib-dirs)          In these dirs.
+                Str  :ri($also-lib-dirs)    In …<./lib/>, then in these dirs.
+            EoH
+        ;
+        exit 0;
+    }
 
     if $version {
         say "Test::Selector {Test::Selector::Main.^ver} on $*RAKU.compiler.gist().";
