@@ -12,6 +12,7 @@ multi sub MAIN (
     Str  :r($lib-dirs),
     Str  :ri($also-lib-dirs),
     Bool :q($quiet) = False,
+    Bool :qq($very-quiet) = False,
     Bool :l($list) = False,
     Bool :v($version) = False,
 ) {
@@ -26,10 +27,13 @@ multi sub MAIN (
 
         react {
             whenever $proc.stdout.lines {
-                next if $quiet && (
+                next if (
                     / ^ \s* ok \ / ||
                     / ^ '# Subtest: ' /
-                );
+                ) && ($quiet || $very-quiet);
+                next if (
+                    / ^ \s* '# ' /
+                ) && $very-quiet;
                 say $_;
             }
             whenever $proc.stderr.lines {
