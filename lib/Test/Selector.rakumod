@@ -135,6 +135,11 @@ Here are a few example invocations:
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being output.
 
+    -qq :
+
+        Run blocks even more quietly, preventing also any line whose first
+        non-blank char is '#' from being output.
+
     -v :
 
         This will print the module version, something like
@@ -423,7 +428,7 @@ use IO::Glob;
 my $block-def_sub;
 my $block-lbl_sub;
 
-class Test::Selector:ver<0.2.0>:auth<zef:lucs> {
+class Test::Selector:ver<0.3.0>:auth<zef:lucs> {
 
     my $glob = %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> // '*';
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';
