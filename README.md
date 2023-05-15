@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/lucs/Test-Selector/actions/workflows/test.yml/badge.svg)](https://github.com/lucs/Test-Selector/actions)
+[![Actions Status](https://github.com/lucs/Test-Selector.git/actions/workflows/test.yml/badge.svg)](https://github.com/lucs/Test-Selector.git/actions)
 
 NAME
 ====
@@ -120,6 +120,17 @@ Here are a few example invocations:
 
         Run blocks more quietly, preventing ｢ok:｣ and ｢# Subtest:｣
         lines from being output.
+
+    -qq :
+
+        Run blocks even more quietly, preventing also any line whose first
+        non-blank char is '#' from being output.
+
+    -v :
+
+        This will print the module version, something like
+        "Test::Selector 0.2.0 on rakudo (2023.02)", and immediately
+        exit the program.
 
 sub label ()
 ------------
