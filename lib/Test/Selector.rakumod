@@ -428,7 +428,7 @@ use IO::Glob;
 my $block-def_sub;
 my $block-lbl_sub;
 
-class Test::Selector:ver<0.3.0>:auth<zef:lucs> {
+class Test::Selector:ver<0.3.1>:auth<zef:lucs> {
 
     my $glob = %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> // '*';
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';

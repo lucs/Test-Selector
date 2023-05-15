@@ -2,6 +2,9 @@ Revision history for Test-Selector
 
 {{$NEXT}}
 
+0.3.1 2023-05-15T00:34:23-04:00
+    - Fix up docs a bit.
+
 0.3.0 2023-05-14T23:30:24-04:00
     - Add -h option, for commandline help.
     - Add -qq option, for even quieter output.
