@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/lucs/Test-Selector.git/actions/workflows/test.yml/badge.svg)](https://github.com/lucs/Test-Selector.git/actions)
+[![Actions Status](https://github.com/lucs/Test-Selector/actions/workflows/test.yml/badge.svg)](https://github.com/lucs/Test-Selector/actions)
 
 NAME
 ====
