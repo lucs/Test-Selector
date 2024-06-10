@@ -1,4 +1,4 @@
-unit class Test::Selector::Main:ver<0.3.1>:auth<zef:lucs>;
+unit class Test::Selector::Main:ver<0.3.2>:auth<zef:lucs>;
 
 use Path::Finder;
 
