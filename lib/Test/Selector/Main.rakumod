@@ -120,7 +120,7 @@ multi sub MAIN (
     }
 
         # Set up other required envvars.
-    %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> = $blocks-glob;
+    %*ENV<TEST_SELECTOR_WANT> = $blocks-glob;
 
     my $action = $list ?? 'list' !! 'run';
     %*ENV<TEST_SELECTOR_ACTION> = $action;

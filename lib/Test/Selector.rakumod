@@ -490,7 +490,7 @@ my $block-lbl_sub;
 
 class Test::Selector:ver<0.3.3>:auth<zef:lucs> {
 
-    my $glob = %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> // '*';
+    my $glob = %*ENV<TEST_SELECTOR_WANT> // '*';
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';
 
     proto sub block-lbl (|) is export {*}

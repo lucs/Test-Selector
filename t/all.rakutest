@@ -22,7 +22,7 @@ example:
 and builds the appropriate test functions from it. The string will be
 split into its parts on "\n\n+":
 
-    ⟨The test's label⟩ ❲TEST_SELECTOR_LABELS_GLOB value❳? ❲TEST_SELECTOR_ACTION value❳?
+    ⟨The test's label⟩ ❲TEST_SELECTOR_WANT value❳? ❲TEST_SELECTOR_ACTION value❳?
 
     ｢The tests｣
 
@@ -48,7 +48,7 @@ sub testsel (
         # Set up the environment variables.
     $glob   = (! $glob.defined || $glob eq "undef") ?? "*" !! $glob;
     $action = ! $action.defined ?? "run" !! $action;
-    %*ENV<TEST_SELECTOR_BLOCKS_LABEL_PATTERN> = $glob;
+    %*ENV<TEST_SELECTOR_WANT> = $want;
     %*ENV<TEST_SELECTOR_ACTION> = $action;
 
         # The expected STDERR may be empty.
