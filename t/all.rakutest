@@ -7,8 +7,18 @@ use-ok('Test::Selector');
 #|{
 
 The testsel() function is for writing tests for this module. It takes
-a single argument, a four-part string that looks like this for
-example:
+a single argument, a four-part string structured like this, where the
+parts are separated by  "\n\n+":
+
+    ⟨The test's label⟩ ❲ ⟨TEST_SELECTOR_WANT value⟩ ❲ ⟨TEST_SELECTOR_ACTION value⟩ ❳ ❳
+
+    ⟨Code incorporating the tests⟩
+
+    ⟨Expected STDOUT⟩
+
+    ⟨Expected STDERR⟩
+
+For example:
 
     t_1 a
 
@@ -18,17 +28,6 @@ example:
     1..0
 
     # No tests run!
-
-and builds the appropriate test functions from it. The string will be
-split into its parts on "\n\n+":
-
-    ⟨The test's label⟩ ❲TEST_SELECTOR_WANT value❳? ❲TEST_SELECTOR_ACTION value❳?
-
-    ｢The tests｣
-
-    ｢Expected STDOUT｣
-
-    ｢Expected STDERR｣
 
 Care must be taken that none of the parts contain two consecutive
 newlines (the separator), but the easy readability of the tests makes
@@ -43,10 +42,10 @@ sub testsel (
 ) {
     $test_def .= chomp;
     my ($iden, $tests, $exp-out, $exp-err) = $test_def.split(/\n\n+/);
-    my ($label, $glob, $action) = $iden.split(/ <space> +/);
+    my ($label, $want, $action) = $iden.split(/ <space> +/);
 
         # Set up the environment variables.
-    $glob   = (! $glob.defined || $glob eq "undef") ?? "*" !! $glob;
+    $want   = (! $want.defined || $want eq "undef") ?? "*" !! $want;
     $action = ! $action.defined ?? "run" !! $action;
     %*ENV<TEST_SELECTOR_WANT> = $want;
     %*ENV<TEST_SELECTOR_ACTION> = $action;
