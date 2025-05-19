@@ -525,7 +525,15 @@ class Test::Selector:ver<0.3.3>:auth<zef:lucs> {
             return unless $action eq 'run' && ! $silent;
             say("   # $label : skipped"), return if $skip;
             say "   # $label";
-            $code.();
+
+                # Appears to avoid bad sequencing of outputs to OUT
+                # and ERR when $code invokes methods from the Test
+                # module.
+            my Str $capture = '';
+            with class :: {
+                method print($s) { $capture ~= $s }
+            }.new xx 2 -> ($*OUT, $*ERR) { $code.(); };
+            print $capture;
         }
     }
 
