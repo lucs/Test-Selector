@@ -1,5 +1,11 @@
 Revision history for Test-Selector
 
+0.4.1 2026-01-10T20:23:23-05:00
+    - Incorporate <lib/Test/Selector/Main.rakumod> into
+      <lib/Test/Selector.rakumod>.
+    - Fix a glob expansion bug.
+    - Ensure generated test files use the development version.
+
 0.4.0 2025-05-18T23:22:59-04:00
     - Ensure correct order of OUT and ERR output.
     - Rename TEST_SELECTOR_BLOCKS_LABEL_PATTERN to TEST_SELECTOR_WANT.
