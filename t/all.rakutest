@@ -55,8 +55,10 @@ sub testsel (
 
         # Build a test file.
     my ($fn, $fh) = tempfile;
+
     print $fh: qq:to/EoF/;
         use Test;
+        use lib "{$?FILE.IO.dirname.IO.parent.child('lib').dirname ~ '/lib'}";
         use Test::Selector '$block-def_sub', '$block-lbl_sub';
         $tests
         done-testing;
@@ -64,9 +66,7 @@ sub testsel (
     $fh.close;
 
         # Run it.
-    my $lib = $?FILE.IO.dirname.IO.parent.child('lib').dirname;
-    my @cmd = $*EXECUTABLE, "-I", $lib, $fn;
-    my $proc = run @cmd, :err, :out;
+    my $proc = run $*EXECUTABLE, $fn, :err, :out;
     my $got-out = $proc.out.slurp-rest.chomp;
     my $got-err = $proc.err.slurp-rest.chomp;
 
@@ -102,10 +102,6 @@ that would fail given "whenever $proc.stderr" and succeed with
 # 
 # &f('err ' ~ '.' x 130)
 # EoT
-
-# --------------------------------------------------------------------
-#done-testing;
-#=finish
 
 # --------------------------------------------------------------------
 testsel q:to/EoT/;
