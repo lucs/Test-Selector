@@ -483,14 +483,16 @@ it under the Artistic License 2.0.
 =end pod
 
 # --------------------------------------------------------------------
-use IO::Glob;
-
 my $block-def_sub;
 my $block-lbl_sub;
 
 class Test::Selector:ver<0.4.0>:auth<zef:lucs> {
 
-    my $glob = %*ENV<TEST_SELECTOR_WANT> // '*';
+    my $want-regex = %*ENV<TEST_SELECTOR_WANT> // '*';
+    $want-regex ~~ s:g/ '?' /./;
+    $want-regex ~~ s:g/ '*' /.*?/;
+    $want-regex ~~ s:g/ '[' /<[/;
+    $want-regex ~~ s:g/ ']' /]>/;
     my $action = %*ENV<TEST_SELECTOR_ACTION> // 'run';
 
     proto sub block-lbl (|) is export {*}
@@ -520,7 +522,7 @@ class Test::Selector:ver<0.4.0>:auth<zef:lucs> {
         my $silent = so $to_match ~~ s/^__//;
         my $skip = so $to_match ~~ s/^_//;
         %*ENV<TEST_SELECTOR_LABEL> = $label;
-        if ($to_match ~~ glob($glob)) {
+        if $to_match ~~ /^ <$want-regex> $/ {
             say($label), return if $action eq 'list';
             return unless $action eq 'run' && ! $silent;
             say("   # $label : skipped"), return if $skip;
