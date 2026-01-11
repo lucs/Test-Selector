@@ -2,5 +2,5 @@
 
 my %*SUB-MAIN-OPTS = :named-anywhere;
 
-use Test::Selector::Main :MAIN;
+use Test::Selector :MAIN;
 
