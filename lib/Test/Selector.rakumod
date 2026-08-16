@@ -611,7 +611,7 @@ multi sub MAIN (
         react {
             whenever $proc.stdout.lines {
                 next if (
-                    / ^ \s* ok \ / ||
+                    / ^ \s* ok ' ' / ||
                     / ^ '# Subtest: ' /
                 ) && ($quiet || $very-quiet);
                 next if (
