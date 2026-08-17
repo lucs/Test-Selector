@@ -486,7 +486,7 @@ it under the Artistic License 2.0.
 my $block-def_sub;
 my $block-lbl_sub;
 
-class Test::Selector:ver<0.4.1>:auth<zef:lucs> {
+class Test::Selector:ver<0.4.2>:auth<zef:lucs> {
 
     my $want-regex = %*ENV<TEST_SELECTOR_WANT> // '*';
     $want-regex ~~ s:g/ '?' /./;
