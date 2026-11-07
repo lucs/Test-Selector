@@ -1,5 +1,8 @@
 Revision history for Test-Selector
 
+0.4.3 2026-11-07T15:26:06-05:00
+    - Ensure generated test files see staged dependencies.
+
 0.4.2 2026-08-16T20:47:11-04:00
     - Match the space after "ok" with a quoted space.
     - Add space before colon following printed file name.
