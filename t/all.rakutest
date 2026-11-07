@@ -65,8 +65,17 @@ sub testsel (
         EoF
     $fh.close;
 
+        # Make sure the tests staging area is included in the modules
+        # search path, in case some dependencies are not installed in
+        # the currently running version.
+    my @includes = $*REPO.repo-chain
+        .map({ .?path-spec })
+        .grep(*.defined)
+        .map({ "-I$_" })
+    ;
+
         # Run it.
-    my $proc = run $*EXECUTABLE, $fn, :err, :out;
+    my $proc = run $*EXECUTABLE, |@includes, $fn, :err, :out;
     my $got-out = $proc.out.slurp-rest.chomp;
     my $got-err = $proc.err.slurp-rest.chomp;
 
